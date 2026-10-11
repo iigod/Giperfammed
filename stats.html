@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Статистика — Лихорадка у детей</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root { --pico-font-family: 'Manrope', system-ui, sans-serif; --brand: #0d6efd; }
+    body { padding-bottom: 3rem; }
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--pico-background-color);
+      border-bottom: 1px solid var(--pico-muted-border-color);
+      padding: .8rem 0;
+    }
+    .topbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand {
+      font-weight: 800; color: var(--pico-color);
+      text-decoration: none; display: flex; align-items: center; gap: .5rem;
+    }
+    .brand i { color: var(--brand); }
+    h1 { font-weight: 800; margin-bottom: .3rem; }
+    .lead { color: var(--pico-muted-color); margin-bottom: 2rem; }
+    .stat-total {
+      background: linear-gradient(135deg, #0d6efd, #4f9dff);
+      color: #fff; padding: 1.4rem 1.6rem; border-radius: 14px;
+      margin-bottom: 2rem;
+    }
+    .stat-total span { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+    .stat-total p { margin: .3rem 0 0; opacity: .9; }
+    .charts {
+      display: grid; gap: 1.4rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    .chart-card {
+      background: var(--pico-card-background-color);
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: 14px; padding: 1.2rem 1.4rem;
+    }
+    .chart-card h3 {
+      font-size: 1rem; font-weight: 700;
+      margin-bottom: .9rem; color: var(--pico-color);
+    }
+    .chart-card canvas { max-height: 260px; }
+    .error {
+      background: #ffe9e9; color: #9c1d1d; padding: 1rem 1.2rem;
+      border-radius: 10px; font-size: .92rem;
+    }
+    [data-theme="dark"] .error { background: #3a1616; color: #ffb3b3; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <i class="bi bi-thermometer-half"></i>
+        <span>Лихорадка у детей</span>
+      </a>
+      <a href="index.html" role="button" class="secondary outline">
+        <i class="bi bi-arrow-left"></i> На главную
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem;">
+    <h1>Статистика опроса</h1>
+    <p class="lead">Данные обновляются автоматически при каждой загрузке страницы.</p>
+
+    <div class="stat-total">
+      <span id="total">—</span>
+      <p>ответов собрано</p>
+    </div>
+
+    <div id="loading" class="lead">Загрузка данных…</div>
+    <div id="error" class="error" hidden></div>
+    <div id="charts" class="charts"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    /* ★★★ ЗАМЕНИ НА ТУ ЖЕ CSV-ССЫЛКУ, ЧТО И В index.html ★★★ */
+    const CSV_URL = 'ВСТАВЬ_СЮДА_ССЫЛКУ_CSV';
+
+    const PALETTE = [
+      '#0d6efd','#4f9dff','#1f9d55','#f5a623','#e5484d',
+      '#8b5cf6','#06b6d4','#ec4899','#84cc16','#f97316'
+    ];
+
+    const loadingEl = document.getElementById('loading');
+    const errorEl   = document.getElementById('error');
+    const chartsEl  = document.getElementById('charts');
+
+    if (!CSV_URL || CSV_URL.includes('ВСТАВЬ')) {
+      loadingEl.remove();
+      errorEl.hidden = false;
+      errorEl.textContent = 'Ссылка на CSV ещё не указана. Опубликуйте Google Таблицу как CSV и вставьте ссылку в код.';
+    } else {
+      Papa.parse(CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const rows = results.data.filter(r =>
+            Object.values(r).some(v => v && String(v).trim() !== '')
+          );
+
+          document.getElementById('total').textContent = rows.length;
+          loadingEl.remove();
+
+          if (!rows.length) {
+            errorEl.hidden = false;
+            errorEl.textContent = 'Пока нет ответов. Как только появятся — тут появятся графики.';
+            return;
+          }
+
+          const headers = results.meta.fields.filter(h => h && h.trim() !== '');
+
+          headers.forEach((header) => {
+            if (/timestamp|отметка времени|id|email|почт/i.test(header)) return;
+
+            const counts = {};
+            rows.forEach(r => {
+              const val = (r[header] || '').toString().trim() || 'Без ответа';
+              val.split(',').map(v => v.trim()).filter(Boolean).forEach(v => {
+                counts[v] = (counts[v] || 0) + 1;
+              });
+            });
+
+            const labels = Object.keys(counts);
+            const data   = Object.values(counts);
+
+            const card = document.createElement('div');
+            card.className = 'chart-card';
+            card.innerHTML = `<h3>${escapeHtml(header)}</h3><canvas></canvas>`;
+            chartsEl.appendChild(card);
+
+            const isBinary = labels.length === 2;
+            const isLongText = labels.some(l => l.length > 40);
+
+            new Chart(card.querySelector('canvas'), {
+              type: isBinary ? 'doughnut' : 'bar',
+              data: {
+                labels,
+                datasets: [{
+                  data,
+                  backgroundColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
+                  borderRadius: 6,
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: isLongText ? 'y' : 'x',
+                plugins: {
+                  legend: {
+                    display: isBinary,
+                    position: 'bottom',
+                    labels: { font: { family: 'Manrope' }, padding: 12 }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => {
+                        const total = data.reduce((a, b) => a + b, 0);
+                        const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                        return ` ${ctx.parsed} (${pct}%)`;
+                      }
+                    }
+                  }
+                },
+                scales: isBinary ? {} : {
+                  x: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } },
+                  y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } }
+                }
+              }
+            });
+          });
+        },
+        error: () => {
+          loadingEl.remove();
+          errorEl.hidden = false;
+          errorEl.textContent =
+            'Не удалось загрузить данные. Проверьте, что таблица опубликована как CSV и ссылка верна.';
+        }
+      });
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c =>
+        ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]
+      );
+    }
+  </script>
+</body>
+</html>
