@@ -2,7 +2,7 @@
 <html lang="ru" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Лихорадка у детей — исследовательский проект</title>
   <meta name="description" content="Информационный проект об осведомлённости родителей о лихорадке у детей. Анонимный опрос, советы и калькулятор дозы." />
 
@@ -20,18 +20,25 @@
       --danger: #e5484d;
     }
     [data-theme="dark"] { --brand-soft: #14243d; }
-    body { scroll-behavior: smooth; }
+
+    html { scroll-behavior: smooth; }
+    body {
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
 
     /* ШАПКА */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       background: color-mix(in srgb, var(--pico-background-color) 85%, transparent);
       border-bottom: 1px solid var(--pico-muted-border-color);
     }
     .topbar .container {
       display: flex; align-items: center; justify-content: space-between;
-      padding-top: .6rem; padding-bottom: .6rem; flex-wrap: wrap; gap: .5rem;
+      padding-top: .6rem; padding-bottom: .6rem;
+      flex-wrap: wrap; gap: .5rem;
     }
     .brand {
       display: flex; align-items: center; gap: .5rem;
@@ -46,6 +53,7 @@
     .nav-links a {
       text-decoration: none; color: var(--pico-color);
       font-weight: 500; font-size: .95rem;
+      white-space: nowrap;
     }
     .nav-links a:hover { color: var(--brand); }
     .theme-btn {
@@ -62,8 +70,9 @@
       background: radial-gradient(60% 80% at 50% 0%, var(--brand-soft) 0%, transparent 70%);
     }
     .hero h1 {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-size: clamp(1.7rem, 5vw, 2.8rem);
       font-weight: 800; margin-bottom: .8rem; letter-spacing: -.02em;
+      line-height: 1.15;
     }
     .hero p.lead {
       max-width: 640px; margin: 0 auto 1.8rem;
@@ -76,11 +85,12 @@
     .section-title {
       display: flex; align-items: center; gap: .6rem;
       font-weight: 800; font-size: 1.6rem; margin-bottom: .4rem;
+      line-height: 1.2;
     }
     .section-title i { color: var(--brand); }
     .section-sub { color: var(--pico-muted-color); margin-bottom: 2rem; }
 
-    /* КАРТОЧКИ ИНФОРМАЦИИ */
+    /* КАРТОЧКИ */
     .info-grid {
       display: grid; gap: 1rem;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -144,15 +154,19 @@
       color: var(--pico-muted-color); display: flex; gap: .4rem; align-items: flex-start;
     }
 
-    /* ОПРОС */
+    /* ОПРОС — важно для мобильных */
     .survey-box {
       border: 1px solid var(--pico-muted-border-color);
-      border-radius: 16px; padding: 1.2rem;
+      border-radius: 16px;
+      padding: 0;
       background: var(--pico-card-background-color);
+      overflow: hidden;
     }
     .survey-box iframe {
-      width: 100%; min-height: 640px; border: 0; border-radius: 10px;
-      background: #fff;
+      width: 100%;
+      min-height: 800px;
+      border: 0;
+      display: block;
     }
     .consent {
       font-size: .85rem; color: var(--pico-muted-color);
@@ -177,9 +191,87 @@
     }
     footer a { color: var(--brand); }
 
-    @media (max-width: 640px) {
-      .nav-links { gap: .9rem; font-size: .9rem; }
-      .nav-links a.optional { display: none; }
+    /* ============================================= */
+    /* МОБИЛЬНАЯ АДАПТАЦИЯ */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      section { padding: 2rem 0; }
+
+      /* Шапка: бренд сверху, меню снизу, всё по центру */
+      .topbar .container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: .4rem;
+      }
+      .brand {
+        justify-content: center;
+      }
+      .nav-links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: .5rem .9rem;
+      }
+      .nav-links a { font-size: .85rem; }
+      .nav-links .optional { display: none; }
+
+      .theme-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      /* Hero */
+      .hero { padding: 2.5rem 0 1.5rem; }
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: .6rem;
+      }
+      .hero-actions a {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+
+      /* Карточки в одну колонку */
+      .info-grid { grid-template-columns: 1fr; }
+
+      /* Аккордеон */
+      .advice details { padding: .9rem 1rem; }
+      .advice summary { font-size: .95rem; }
+      .advice details p { font-size: .93rem; }
+
+      /* Калькулятор */
+      .calc-box { padding: 1.1rem; }
+      .calc-box .grid { grid-template-columns: 1fr; gap: .8rem; }
+
+      /* Форма Google */
+      .survey-box iframe {
+        min-height: 900px;
+        max-width: 100%;
+      }
+      .consent { font-size: .8rem; padding: .7rem .85rem; }
+      .counter { font-size: .9rem; padding: .85rem 1rem; }
+      .counter i { font-size: 1.1rem; }
+
+      /* Заголовки секций */
+      .section-title { font-size: 1.4rem; }
+      .section-sub { margin-bottom: 1.2rem; }
+    }
+
+    /* Очень узкие экраны */
+    @media (max-width: 400px) {
+      .brand span { font-size: .95rem; }
+      .brand i { font-size: 1.15rem; }
+      .nav-links a { font-size: .8rem; }
+      .hero h1 { font-size: 1.45rem; }
+      .section-title { font-size: 1.25rem; }
+      .hero p.lead { font-size: .95rem; }
+      .survey-box iframe { min-height: 1000px; }
     }
   </style>
 </head>
@@ -221,7 +313,7 @@
       </p>
       <div class="hero-actions">
         <a href="#survey" role="button">
-          <i class="bi bi-clipboard-check"></i> Пройти опрос
+          <i class="bi bi-clipboard-check"></i>&nbsp;Пройти опрос
         </a>
         <a href="#info" role="button" class="secondary outline">
           Узнать больше
