@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Лихорадка у детей — исследовательский проект</title>
+  <meta name="description" content="Информационный проект об осведомлённости родителей о лихорадке у детей. Анонимный опрос, советы и калькулятор дозы." />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pico-font-family: 'Manrope', system-ui, sans-serif;
+      --brand: #0d6efd;
+      --brand-soft: #e7f0ff;
+      --danger: #e5484d;
+    }
+    [data-theme="dark"] { --brand-soft: #14243d; }
+    body { scroll-behavior: smooth; }
+
+    /* ШАПКА */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(10px);
+      background: color-mix(in srgb, var(--pico-background-color) 85%, transparent);
+      border-bottom: 1px solid var(--pico-muted-border-color);
+    }
+    .topbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: .6rem; padding-bottom: .6rem; flex-wrap: wrap; gap: .5rem;
+    }
+    .brand {
+      display: flex; align-items: center; gap: .5rem;
+      font-weight: 800; font-size: 1.05rem; color: var(--pico-color);
+      text-decoration: none;
+    }
+    .brand i { color: var(--brand); font-size: 1.35rem; }
+    .nav-links {
+      display: flex; align-items: center; gap: 1.2rem;
+      list-style: none; margin: 0; padding: 0;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--pico-color);
+      font-weight: 500; font-size: .95rem;
+    }
+    .nav-links a:hover { color: var(--brand); }
+    .theme-btn {
+      background: transparent; border: 1px solid var(--pico-muted-border-color);
+      color: var(--pico-color); width: 38px; height: 38px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0;
+    }
+    .theme-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+    /* HERO */
+    .hero {
+      padding: 4rem 0 2.5rem; text-align: center;
+      background: radial-gradient(60% 80% at 50% 0%, var(--brand-soft) 0%, transparent 70%);
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; margin-bottom: .8rem; letter-spacing: -.02em;
+    }
+    .hero p.lead {
+      max-width: 640px; margin: 0 auto 1.8rem;
+      color: var(--pico-muted-color); font-size: 1.05rem;
+    }
+    .hero-actions { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
+
+    /* СЕКЦИИ */
+    section { padding: 3rem 0; }
+    .section-title {
+      display: flex; align-items: center; gap: .6rem;
+      font-weight: 800; font-size: 1.6rem; margin-bottom: .4rem;
+    }
+    .section-title i { color: var(--brand); }
+    .section-sub { color: var(--pico-muted-color); margin-bottom: 2rem; }
+
+    /* КАРТОЧКИ ИНФОРМАЦИИ */
+    .info-grid {
+      display: grid; gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .info-card {
+      background: var(--pico-card-background-color);
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: 14px; padding: 1.4rem;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .info-card:hover { transform: translateY(-3px); border-color: var(--brand); }
+    .info-card .ic {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--brand-soft); color: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: .9rem;
+    }
+    .info-card h3 { font-size: 1.05rem; margin-bottom: .4rem; font-weight: 700; }
+    .info-card p { font-size: .93rem; color: var(--pico-muted-color); margin: 0; }
+
+    /* АККОРДЕОН */
+    .advice details {
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: 12px; padding: 1rem 1.2rem;
+      margin-bottom: .7rem; background: var(--pico-card-background-color);
+    }
+    .advice details[open] { border-color: var(--brand); }
+    .advice summary {
+      font-weight: 600; cursor: pointer; list-style: none;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .advice summary::-webkit-details-marker { display: none; }
+    .advice summary i.arrow { margin-left: auto; transition: transform .2s; }
+    .advice details[open] summary i.arrow { transform: rotate(180deg); }
+    .advice details p { margin-top: .8rem; font-size: .94rem; color: var(--pico-muted-color); }
+
+    .flags {
+      border-left: 4px solid var(--danger);
+      background: color-mix(in srgb, var(--danger) 8%, transparent);
+      border-radius: 10px; padding: 1rem 1.2rem; margin-top: 1rem;
+    }
+    .flags h4 { color: var(--danger); margin-bottom: .5rem; font-size: 1rem; }
+    .flags ul { margin: 0; padding-left: 1.2rem; font-size: .93rem; }
+
+    /* КАЛЬКУЛЯТОР */
+    .calc-box {
+      background: var(--pico-card-background-color);
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: 14px; padding: 1.4rem;
+    }
+    .calc-result {
+      margin-top: 1.2rem; padding: 1.1rem 1.2rem;
+      background: var(--brand-soft); border-radius: 10px;
+      border-left: 4px solid var(--brand);
+    }
+    .calc-result h4 { margin: 0 0 .6rem; color: var(--brand); font-size: 1.05rem; }
+    .calc-result p { margin: 0 0 .35rem; font-size: .95rem; }
+    .calc-result strong { color: var(--pico-color); }
+    .calc-note {
+      margin-top: 1rem; font-size: .82rem;
+      color: var(--pico-muted-color); display: flex; gap: .4rem; align-items: flex-start;
+    }
+
+    /* ОПРОС */
+    .survey-box {
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: 16px; padding: 1.2rem;
+      background: var(--pico-card-background-color);
+    }
+    .survey-box iframe {
+      width: 100%; min-height: 640px; border: 0; border-radius: 10px;
+      background: #fff;
+    }
+    .consent {
+      font-size: .85rem; color: var(--pico-muted-color);
+      background: var(--brand-soft); padding: .8rem 1rem;
+      border-radius: 10px; margin-bottom: 1rem;
+    }
+    .counter {
+      margin-top: 1.2rem; padding: 1rem 1.2rem;
+      background: var(--brand-soft); border-radius: 12px;
+      display: flex; align-items: center; gap: .7rem;
+      font-size: .98rem;
+    }
+    .counter i { color: var(--brand); font-size: 1.3rem; }
+    .counter strong { color: var(--brand); font-size: 1.15rem; }
+
+    /* ПОДВАЛ */
+    footer {
+      border-top: 1px solid var(--pico-muted-border-color);
+      padding: 2rem 0; margin-top: 2rem;
+      color: var(--pico-muted-color); font-size: .9rem;
+      text-align: center;
+    }
+    footer a { color: var(--brand); }
+
+    @media (max-width: 640px) {
+      .nav-links { gap: .9rem; font-size: .9rem; }
+      .nav-links a.optional { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ШАПКА -->
+  <header class="topbar">
+    <div class="container">
+      <a href="#" class="brand">
+        <i class="bi bi-thermometer-half"></i>
+        <span>Лихорадка у детей</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#info">Информация</a></li>
+          <li><a href="#advice">Советы</a></li>
+          <li><a href="#calc" class="optional">Калькулятор</a></li>
+          <li><a href="stats.html" class="optional">Статистика</a></li>
+          <li><a href="#survey" role="button" class="contrast">Пройти опрос</a></li>
+          <li>
+            <button class="theme-btn" id="themeToggle" aria-label="Переключить тему">
+              <i class="bi bi-moon-stars" id="themeIcon"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Помогите нам понять,<br>что родители знают о лихорадке</h1>
+      <p class="lead">
+        Мы проводим учебное исследование, чтобы оценить осведомлённость родителей
+        о правилах снижения температуры у детей и о ситуациях, когда нужно
+        обращаться за медицинской помощью. Опрос анонимный, займёт 3–5 минут.
+      </p>
+      <div class="hero-actions">
+        <a href="#survey" role="button">
+          <i class="bi bi-clipboard-check"></i> Пройти опрос
+        </a>
+        <a href="#info" role="button" class="secondary outline">
+          Узнать больше
+        </a>
+      </div>
+    </section>
+
+    <!-- ИНФОРМАЦИЯ -->
+    <section id="info">
+      <div class="section-title">
+        <i class="bi bi-info-circle"></i>
+        <span>Информация</span>
+      </div>
+      <p class="section-sub">Коротко о том, что важно знать каждому родителю.</p>
+
+      <div class="info-grid">
+        <article class="info-card">
+          <div class="ic"><i class="bi bi-thermometer"></i></div>
+          <h3>Что такое лихорадка</h3>
+          <p>Повышение температуры тела выше 37,5 °C — это нормальный защитный ответ
+             организма на инфекцию, а не самостоятельная болезнь.</p>
+        </article>
+
+        <article class="info-card">
+          <div class="ic"><i class="bi bi-graph-up"></i></div>
+          <h3>Какая температура опасна</h3>
+          <p>Сам по себе уровень температуры не всегда отражает тяжесть состояния.
+             Важнее — общее самочувствие ребёнка и его поведение.</p>
+        </article>
+
+        <article class="info-card">
+          <div class="ic"><i class="bi bi-shield-check"></i></div>
+          <h3>Не всякую температуру нужно сбивать</h3>
+          <p>Умеренная лихорадка помогает организму бороться с инфекцией.
+             Жаропонижающие нужны не всегда — об этом в разделе «Советы».</p>
+        </article>
+
+        <article class="info-card">
+          <div class="ic"><i class="bi bi-question-circle"></i></div>
+          <h3>Частые мифы</h3>
+          <p>«Обтирание водкой», «аспирин детям», «чем выше температура — тем опаснее» —
+             разбираем популярные заблуждения.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- СОВЕТЫ -->
+    <section id="advice" class="advice">
+      <div class="section-title">
+        <i class="bi bi-lightbulb"></i>
+        <span>Советы родителям</span>
+      </div>
+      <p class="section-sub">Практические рекомендации, основанные на клинических руководствах.</p>
+
+      <details open>
+        <summary>
+          <i class="bi bi-thermometer-half"></i>
+          Как правильно измерять температуру
+          <i class="bi bi-chevron-down arrow"></i>
+        </summary>
+        <p>
+          Используйте цифровой термометр. У детей до 5 лет предпочтительно измерение
+          в подмышечной впадине или ректально (в зависимости от возраста и рекомендаций
+          педиатра). Измеряйте в состоянии покоя, не сразу после еды или прогулки.
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <i class="bi bi-capsule"></i>
+          Когда и чем сбивать температуру
+          <i class="bi bi-chevron-down arrow"></i>
+        </summary>
+        <p>
+          Жаропонижающие обычно рекомендуются при температуре выше 38,5 °C, либо
+          раньше — если ребёнок плохо переносит жар. У детей разрешены
+          парацетамол и ибупрофен в возрастных дозах. Аспирин детям противопоказан.
+          Дозу рассчитывают по весу, а не по возрасту.
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <i class="bi bi-droplet"></i>
+          Что делать дополнительно
+          <i class="bi bi-chevron-down arrow"></i>
+        </summary>
+        <p>
+          Обильное питьё, лёгкая одежда, комфортная температура в комнате (20–22 °C),
+          покой. Не укутывайте ребёнка. Обтирание холодной водой и спиртом
+          не рекомендуется — это может ухудшить состояние.
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <i class="bi bi-exclamation-triangle"></i>
+          Когда нужно вызывать врача
+          <i class="bi bi-chevron-down arrow"></i>
+        </summary>
+        <p>
+          Смотрите не только на цифру на термометре, но и на состояние ребёнка.
+          Тревожные признаки перечислены ниже.
+        </p>
+        <div class="flags">
+          <h4><i class="bi bi-shield-exclamation"></i> Красные флаги</h4>
+          <ul>
+            <li>Ребёнок до 3 месяцев с температурой 38 °C и выше</li>
+            <li>Температура выше 40 °C, плохо снижается жаропонижающими</li>
+            <li>Сыпь, не бледнеющая при нажатии</li>
+            <li>Судороги, потеря сознания, необычная сонливость</li>
+            <li>Затруднённое дыхание, синюшность губ</li>
+            <li>Отказ от питья, признаки обезвоживания</li>
+            <li>Лихорадка длится более 3 суток без улучшения</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- КАЛЬКУЛЯТОР -->
+    <section id="calc">
+      <div class="section-title">
+        <i class="bi bi-calculator"></i>
+        <span>Калькулятор дозы</span>
+      </div>
+      <p class="section-sub">
+        Ориентировочный расчёт разовой дозы жаропонижающего по весу ребёнка.
+        Носит справочный характер и не заменяет назначение врача.
+      </p>
+
+      <div class="calc-box">
+        <div class="grid">
+          <label>
+            Вес ребёнка (кг)
+            <input type="number" id="weight" min="3" max="60" step="0.5"
+                   placeholder="например, 14" inputmode="decimal">
+          </label>
+          <label>
+            Препарат
+            <select id="drug">
+              <option value="paracetamol">Парацетамол — сироп 120 мг / 5 мл</option>
+              <option value="ibuprofen">Ибупрофен — суспензия 100 мг / 5 мл</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="calcResult" class="calc-result" hidden></div>
+
+        <p class="calc-note">
+          <i class="bi bi-exclamation-triangle"></i>
+          Не превышайте суточную дозу. При сомнениях — обратитесь к врачу.
+        </p>
+      </div>
+    </section>
+
+    <!-- ОПРОС -->
+    <section id="survey">
+      <div class="section-title">
+        <i class="bi bi-clipboard-check"></i>
+        <span>Анонимный опрос</span>
+      </div>
+      <p class="section-sub">Пожалуйста, ответьте честно — правильных и неправильных ответов нет.</p>
+
+      <div class="consent">
+        <i class="bi bi-shield-lock"></i>
+        Опрос полностью анонимный. Мы не собираем имена, телефоны и IP-адреса.
+        Результаты используются только в обобщённом виде в рамках учебной
+        исследовательской работы. Проходя опрос, вы соглашаетесь с этим.
+      </div>
+
+      <div class="survey-box">
+        <!-- ★★★ ЗАМЕНИ src НА ССЫЛКУ ТВОЕЙ ФОРМЫ (Google Forms или Tally) ★★★ -->
+        <iframe
+          src="https://docs.google.com/forms/d/e/ВСТАВЬТЕ_ID/viewform?embedded=true"
+          loading="lazy"
+          title="Опрос о лихорадке у детей">
+          Загрузка…
+        </iframe>
+      </div>
+
+      <div class="counter">
+        <i class="bi bi-people-fill"></i>
+        <span>Опрос уже прошли <strong id="counterNumber">…</strong> человек</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ПОДВАЛ -->
+  <footer>
+    <div class="container">
+      <p>
+        Учебный исследовательский проект · <a href="#">СГМК</a><br>
+        Научный руководитель: Михаил Ханевич<br>
+        <small>Материал носит информационный характер и не заменяет консультацию врача.</small>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /* ★★★ ЗАМЕНИ НА ССЫЛКУ CSV ИЗ ОПУБЛИКОВАННОЙ GOOGLE ТАБЛИЦЫ ★★★ */
+    const CSV_URL = 'ВСТАВЬ_СЮДА_ССЫЛКУ_CSV';
+
+    /* --- Переключение темы --- */
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const saved = localStorage.getItem('theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    updateIcon();
+
+    btn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateIcon();
+    });
+
+    function updateIcon() {
+      const dark = html.getAttribute('data-theme') === 'dark';
+      icon.className = dark ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
+
+    /* --- Калькулятор дозы --- */
+    const wEl = document.getElementById('weight');
+    const dEl = document.getElementById('drug');
+    const resEl = document.getElementById('calcResult');
+
+    function renderCalc() {
+      const w = parseFloat(wEl.value);
+      if (!w || w < 3 || w > 60) { resEl.hidden = true; return; }
+
+      const drug = dEl.value;
+      let html = '';
+
+      if (drug === 'paracetamol') {
+        const lowMg  = Math.round(10 * w);
+        const highMg = Math.round(15 * w);
+        const lowMl  = (10 * w / 24).toFixed(1);
+        const highMl = (15 * w / 24).toFixed(1);
+        const maxDay = Math.round(60 * w);
+        html = `
+          <h4>Парацетамол</h4>
+          <p>Разовая доза: <strong>${lowMg}–${highMg} мг</strong>
+             (${lowMl}–${highMl} мл сиропа 120 мг/5 мл)</p>
+          <p>Не чаще каждые 4–6 часов, не более 4 раз в сутки.</p>
+          <p>Максимум в сутки: <strong>${maxDay} мг</strong>.</p>
+        `;
+      } else {
+        const lowMg  = Math.round(5 * w);
+        const highMg = Math.round(10 * w);
+        const lowMl  = (5 * w / 20).toFixed(1);
+        const highMl = (10 * w / 20).toFixed(1);
+        const maxDay = Math.round(30 * w);
+        html = `
+          <h4>Ибупрофен</h4>
+          <p>Разовая доза: <strong>${lowMg}–${highMg} мг</strong>
+             (${lowMl}–${highMl} мл суспензии 100 мг/5 мл)</p>
+          <p>Не чаще каждые 6–8 часов, не более 3–4 раз в сутки.</p>
+          <p>Максимум в сутки: <strong>${maxDay} мг</strong>.</p>
+        `;
+      }
+
+      resEl.innerHTML = html;
+      resEl.hidden = false;
+    }
+
+    wEl.addEventListener('input', renderCalc);
+    dEl.addEventListener('change', renderCalc);
+
+    /* --- Счётчик прошедших опрос --- */
+    if (CSV_URL && !CSV_URL.includes('ВСТАВЬ')) {
+      fetch(CSV_URL)
+        .then(r => r.text())
+        .then(csv => {
+          const lines = csv.split(/\r?\n/).filter(l => l.trim().length > 0);
+          const count = Math.max(0, lines.length - 1);
+          document.getElementById('counterNumber').textContent = count;
+        })
+        .catch(() => {
+          document.getElementById('counterNumber').textContent = '—';
+        });
+    } else {
+      document.getElementById('counterNumber').textContent = '—';
+    }
+  </script>
+
+</body>
+</html>
