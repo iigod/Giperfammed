@@ -151,20 +151,53 @@
       color: var(--pico-muted-color); display: flex; gap: .4rem; align-items: flex-start;
     }
 
-    /* ОПРОС */
+    /* ОПРОС — теперь кнопка вместо iframe */
     .survey-box {
       border: 1px solid var(--pico-muted-border-color);
       border-radius: 16px;
-      padding: 0;
+      padding: 2.5rem 1.5rem;
       background: var(--pico-card-background-color);
-      overflow: hidden;
+      text-align: center;
     }
-    .survey-box iframe {
-      width: 100%;
-      min-height: 800px;
-      border: 0;
+    .survey-box .survey-illustration {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: var(--brand-soft); color: var(--brand);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin-bottom: 1rem;
+    }
+    .survey-box p.survey-text {
+      font-size: 1.05rem;
+      color: var(--pico-muted-color);
+      max-width: 460px;
+      margin: 0 auto 1.6rem;
+    }
+    .survey-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      font-size: 1.05rem;
+      padding: .85rem 1.8rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      transition: background .15s ease, transform .1s ease;
+    }
+    .survey-btn:hover {
+      background: #0b5ed7;
+      color: #fff;
+    }
+    .survey-btn:active { transform: scale(.98); }
+    .survey-meta {
       display: block;
+      font-size: .82rem;
+      color: var(--pico-muted-color);
+      margin-top: 1rem;
     }
+
     .consent {
       font-size: .85rem; color: var(--pico-muted-color);
       background: var(--brand-soft); padding: .8rem 1rem;
@@ -199,7 +232,6 @@
 
       section { padding: 2rem 0; }
 
-      /* Шапка: бренд сверху, меню ниже в одну-две строки, всё по центру */
       .topbar .container {
         flex-direction: column;
         align-items: center;
@@ -207,9 +239,7 @@
         padding-top: .5rem;
         padding-bottom: .55rem;
       }
-      .brand {
-        justify-content: center;
-      }
+      .brand { justify-content: center; }
       .brand span { font-size: 1rem; }
 
       .nav-links {
@@ -235,7 +265,6 @@
         flex-shrink: 0;
       }
 
-      /* Hero */
       .hero { padding: 2rem 0 1.5rem; }
       .hero-actions {
         flex-direction: column;
@@ -248,33 +277,32 @@
         justify-content: center;
       }
 
-      /* Карточки в одну колонку */
       .info-grid { grid-template-columns: 1fr; }
 
-      /* Аккордеон */
       .advice details { padding: .9rem 1rem; }
       .advice summary { font-size: .95rem; }
       .advice details p { font-size: .93rem; }
 
-      /* Калькулятор */
       .calc-box { padding: 1.1rem; }
       .calc-box .grid { grid-template-columns: 1fr; gap: .8rem; }
 
-      /* Форма Google */
-      .survey-box iframe {
-        min-height: 900px;
-        max-width: 100%;
+      .survey-box { padding: 1.8rem 1rem; }
+      .survey-box .survey-illustration { width: 56px; height: 56px; font-size: 1.6rem; }
+      .survey-box p.survey-text { font-size: .95rem; }
+      .survey-btn {
+        width: 100%;
+        font-size: 1rem;
+        padding: .8rem 1.2rem;
       }
+
       .consent { font-size: .8rem; padding: .7rem .85rem; }
       .counter { font-size: .9rem; padding: .85rem 1rem; }
       .counter i { font-size: 1.1rem; }
 
-      /* Заголовки секций */
       .section-title { font-size: 1.35rem; }
       .section-sub { margin-bottom: 1.2rem; }
     }
 
-    /* Очень узкие экраны */
     @media (max-width: 400px) {
       .brand span { font-size: .95rem; }
       .brand i { font-size: 1.15rem; }
@@ -283,7 +311,6 @@
       .hero h1 { font-size: 1.4rem; }
       .section-title { font-size: 1.2rem; }
       .hero p.lead { font-size: .95rem; }
-      .survey-box iframe { min-height: 1000px; }
     }
   </style>
 </head>
@@ -497,13 +524,21 @@
       </div>
 
       <div class="survey-box">
-        <!-- ★★★ ЗАМЕНИ src НА ССЫЛКУ ТВОЕЙ ФОРМЫ (Google Forms или Tally) ★★★ -->
-        <iframe
-          src="https://docs.google.com/forms/d/e/ВСТАВЬТЕ_ID/viewform?embedded=true"
-          loading="lazy"
-          title="Опрос о лихорадке у детей">
-          Загрузка…
-        </iframe>
+        <div class="survey-illustration">
+          <i class="bi bi-clipboard2-check"></i>
+        </div>
+        <p class="survey-text">
+          Опрос откроется в новом окне Google Forms — так удобнее отвечать с телефона.
+        </p>
+        <!-- ★★★ ЕСЛИ ССЫЛКА НА ФОРМУ ИЗМЕНИТСЯ — ЗАМЕНИ ТОЛЬКО href ★★★ -->
+        <a class="survey-btn"
+           href="https://docs.google.com/forms/d/e/1FAIpQLSfgFipWarHwzJ7qEwItKAtxadMubvxHWtYIIrHRQw6PkTmghg/viewform"
+           target="_blank"
+           rel="noopener">
+          <i class="bi bi-box-arrow-up-right"></i>
+          Открыть опрос
+        </a>
+        <span class="survey-meta">Займёт 3–5 минут</span>
       </div>
 
       <div class="counter">
@@ -611,3 +646,7 @@
     } else {
       document.getElementById('counterNumber').textContent = '—';
     }
+  </script>
+
+</body>
+</html>
