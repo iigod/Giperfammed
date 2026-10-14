@@ -24,12 +24,11 @@
     html { scroll-behavior: smooth; }
     body { overflow-x: hidden; }
 
-    /* ШАПКА */
+    /* ШАПКА — теперь НЕ прилипает, просто стоит вверху страницы */
     .topbar {
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      background: color-mix(in srgb, var(--pico-background-color) 88%, transparent);
+      position: relative;
+      z-index: 10;
+      background: var(--pico-background-color);
       border-bottom: 1px solid var(--pico-muted-border-color);
     }
     .topbar .container {
@@ -53,13 +52,22 @@
       white-space: nowrap;
     }
     .nav-links a:hover { color: var(--brand); }
+
+    /* Кнопка темы — СИНЯЯ и на светлом, и на тёмном фоне */
     .theme-btn {
-      background: transparent; border: 1px solid var(--pico-muted-border-color);
-      color: var(--pico-color); width: 38px; height: 38px; border-radius: 50%;
+      background: transparent;
+      border: 1.5px solid var(--brand);
+      color: var(--brand);
+      width: 38px; height: 38px; border-radius: 50%;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; padding: 0;
+      transition: background .15s ease, color .15s ease;
     }
-    .theme-btn:hover { border-color: var(--brand); color: var(--brand); }
+    .theme-btn i { color: var(--brand); font-size: 1.05rem; }
+    .theme-btn:hover {
+      background: var(--brand);
+    }
+    .theme-btn:hover i { color: #fff; }
 
     /* HERO */
     .hero {
@@ -151,7 +159,7 @@
       color: var(--pico-muted-color); display: flex; gap: .4rem; align-items: flex-start;
     }
 
-    /* ОПРОС — теперь кнопка вместо iframe */
+    /* ОПРОС */
     .survey-box {
       border: 1px solid var(--pico-muted-border-color);
       border-radius: 16px;
@@ -264,6 +272,7 @@
         height: 34px;
         flex-shrink: 0;
       }
+      .theme-btn i { font-size: .95rem; }
 
       .hero { padding: 2rem 0 1.5rem; }
       .hero-actions {
@@ -316,7 +325,7 @@
 </head>
 <body>
 
-  <!-- ШАПКА -->
+  <!-- ШАПКА (не прилипает) -->
   <header class="topbar">
     <div class="container">
       <a href="#" class="brand">
