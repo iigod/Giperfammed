@@ -24,7 +24,7 @@
     html { scroll-behavior: smooth; }
     body { overflow-x: hidden; }
 
-    /* ШАПКА — теперь НЕ прилипает, просто стоит вверху страницы */
+    /* ШАПКА — не прилипает */
     .topbar {
       position: relative;
       z-index: 10;
@@ -53,7 +53,7 @@
     }
     .nav-links a:hover { color: var(--brand); }
 
-    /* Кнопка темы — СИНЯЯ и на светлом, и на тёмном фоне */
+    /* Кнопка темы — синяя */
     .theme-btn {
       background: transparent;
       border: 1.5px solid var(--brand);
@@ -64,9 +64,7 @@
       transition: background .15s ease, color .15s ease;
     }
     .theme-btn i { color: var(--brand); font-size: 1.05rem; }
-    .theme-btn:hover {
-      background: var(--brand);
-    }
+    .theme-btn:hover { background: var(--brand); }
     .theme-btn:hover i { color: #fff; }
 
     /* HERO */
@@ -194,10 +192,7 @@
       border: none;
       transition: background .15s ease, transform .1s ease;
     }
-    .survey-btn:hover {
-      background: #0b5ed7;
-      color: #fff;
-    }
+    .survey-btn:hover { background: #0b5ed7; color: #fff; }
     .survey-btn:active { transform: scale(.98); }
     .survey-meta {
       display: block;
@@ -229,65 +224,32 @@
     }
     footer a { color: var(--brand); }
 
-    /* ============================================= */
     /* МОБИЛЬНАЯ АДАПТАЦИЯ */
-    /* ============================================= */
     @media (max-width: 768px) {
-      .container {
-        padding-left: .9rem;
-        padding-right: .9rem;
-      }
-
+      .container { padding-left: .9rem; padding-right: .9rem; }
       section { padding: 2rem 0; }
 
       .topbar .container {
-        flex-direction: column;
-        align-items: center;
-        gap: .5rem;
-        padding-top: .5rem;
-        padding-bottom: .55rem;
+        flex-direction: column; align-items: center;
+        gap: .5rem; padding-top: .5rem; padding-bottom: .55rem;
       }
       .brand { justify-content: center; }
       .brand span { font-size: 1rem; }
 
       .nav-links {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: .35rem .55rem;
-        width: 100%;
-        row-gap: .35rem;
+        justify-content: center; flex-wrap: wrap;
+        gap: .35rem .55rem; width: 100%; row-gap: .35rem;
       }
-      .nav-links a {
-        font-size: .82rem;
-        padding: .3rem .5rem;
-        border-radius: 8px;
-      }
-      .nav-links a[role="button"] {
-        font-size: .8rem;
-        padding: .38rem .75rem;
-        line-height: 1;
-      }
-      .theme-btn {
-        width: 34px;
-        height: 34px;
-        flex-shrink: 0;
-      }
+      .nav-links a { font-size: .82rem; padding: .3rem .5rem; border-radius: 8px; }
+      .nav-links a[role="button"] { font-size: .8rem; padding: .38rem .75rem; line-height: 1; }
+      .theme-btn { width: 34px; height: 34px; flex-shrink: 0; }
       .theme-btn i { font-size: .95rem; }
 
       .hero { padding: 2rem 0 1.5rem; }
-      .hero-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: .6rem;
-      }
-      .hero-actions a {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-      }
+      .hero-actions { flex-direction: column; align-items: stretch; gap: .6rem; }
+      .hero-actions a { width: 100%; text-align: center; justify-content: center; }
 
       .info-grid { grid-template-columns: 1fr; }
-
       .advice details { padding: .9rem 1rem; }
       .advice summary { font-size: .95rem; }
       .advice details p { font-size: .93rem; }
@@ -298,11 +260,7 @@
       .survey-box { padding: 1.8rem 1rem; }
       .survey-box .survey-illustration { width: 56px; height: 56px; font-size: 1.6rem; }
       .survey-box p.survey-text { font-size: .95rem; }
-      .survey-btn {
-        width: 100%;
-        font-size: 1rem;
-        padding: .8rem 1.2rem;
-      }
+      .survey-btn { width: 100%; font-size: 1rem; padding: .8rem 1.2rem; }
 
       .consent { font-size: .8rem; padding: .7rem .85rem; }
       .counter { font-size: .9rem; padding: .85rem 1rem; }
@@ -325,7 +283,7 @@
 </head>
 <body>
 
-  <!-- ШАПКА (не прилипает) -->
+  <!-- ШАПКА -->
   <header class="topbar">
     <div class="container">
       <a href="#" class="brand">
@@ -539,7 +497,6 @@
         <p class="survey-text">
           Опрос откроется в новом окне Google Forms — так удобнее отвечать с телефона.
         </p>
-        <!-- ★★★ ЕСЛИ ССЫЛКА НА ФОРМУ ИЗМЕНИТСЯ — ЗАМЕНИ ТОЛЬКО href ★★★ -->
         <a class="survey-btn"
            href="https://docs.google.com/forms/d/e/1FAIpQLSfgFipWarHwzJ7qEwItKAtxadMubvxHWtYIIrHRQw6PkTmghg/viewform"
            target="_blank"
@@ -570,8 +527,8 @@
   </footer>
 
   <script>
-    /* ★★★ ЗАМЕНИ НА ССЫЛКУ CSV ИЗ ОПУБЛИКОВАННОЙ GOOGLE ТАБЛИЦЫ ★★★ */
-    const CSV_URL = 'ВСТАВЬ_СЮДА_ССЫЛКУ_CSV';
+    /* ★ CSV-ссылка уже вставлена ★ */
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR01X9EiBi-u1KmtTQ9ExPqiGLjDCoaok6aB1_9j4hJ6ENX8LnIv2yTqhBTe6IVWD2UNZeSSwJewYd0/pub?gid=487976169&single=true&output=csv';
 
     /* --- Переключение темы --- */
     const html = document.documentElement;
@@ -641,20 +598,16 @@
     dEl.addEventListener('change', renderCalc);
 
     /* --- Счётчик прошедших опрос --- */
-    if (CSV_URL && !CSV_URL.includes('ВСТАВЬ')) {
-      fetch(CSV_URL)
-        .then(r => r.text())
-        .then(csv => {
-          const lines = csv.split(/\r?\n/).filter(l => l.trim().length > 0);
-          const count = Math.max(0, lines.length - 1);
-          document.getElementById('counterNumber').textContent = count;
-        })
-        .catch(() => {
-          document.getElementById('counterNumber').textContent = '—';
-        });
-    } else {
-      document.getElementById('counterNumber').textContent = '—';
-    }
+    fetch(CSV_URL)
+      .then(r => r.text())
+      .then(csv => {
+        const lines = csv.split(/\r?\n/).filter(l => l.trim().length > 0);
+        const count = Math.max(0, lines.length - 1);
+        document.getElementById('counterNumber').textContent = count;
+      })
+      .catch(() => {
+        document.getElementById('counterNumber').textContent = '—';
+      });
   </script>
 
 </body>
