@@ -13,7 +13,7 @@
     :root { --pico-font-family: 'Manrope', system-ui, sans-serif; --brand: #0d6efd; }
     body { padding-bottom: 3rem; }
     .topbar {
-      position: sticky; top: 0; z-index: 10;
+      position: relative; z-index: 10;
       background: var(--pico-background-color);
       border-bottom: 1px solid var(--pico-muted-border-color);
       padding: .8rem 0;
@@ -54,6 +54,13 @@
       border-radius: 10px; font-size: .92rem;
     }
     [data-theme="dark"] .error { background: #3a1616; color: #ffb3b3; }
+
+    @media (max-width: 640px) {
+      .topbar .container { flex-direction: column; gap: .5rem; }
+      h1 { font-size: 1.5rem; }
+      .stat-total span { font-size: 2rem; }
+      .charts { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -87,8 +94,8 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    /* ★★★ ЗАМЕНИ НА ТУ ЖЕ CSV-ССЫЛКУ, ЧТО И В index.html ★★★ */
-    const CSV_URL = 'ВСТАВЬ_СЮДА_ССЫЛКУ_CSV';
+    /* ★ CSV-ссылка уже вставлена ★ */
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR01X9EiBi-u1KmtTQ9ExPqiGLjDCoaok6aB1_9j4hJ6ENX8LnIv2yTqhBTe6IVWD2UNZeSSwJewYd0/pub?gid=487976169&single=true&output=csv';
 
     const PALETTE = [
       '#0d6efd','#4f9dff','#1f9d55','#f5a623','#e5484d',
@@ -99,100 +106,94 @@
     const errorEl   = document.getElementById('error');
     const chartsEl  = document.getElementById('charts');
 
-    if (!CSV_URL || CSV_URL.includes('ВСТАВЬ')) {
-      loadingEl.remove();
-      errorEl.hidden = false;
-      errorEl.textContent = 'Ссылка на CSV ещё не указана. Опубликуйте Google Таблицу как CSV и вставьте ссылку в код.';
-    } else {
-      Papa.parse(CSV_URL, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const rows = results.data.filter(r =>
-            Object.values(r).some(v => v && String(v).trim() !== '')
-          );
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const rows = results.data.filter(r =>
+          Object.values(r).some(v => v && String(v).trim() !== '')
+        );
 
-          document.getElementById('total').textContent = rows.length;
-          loadingEl.remove();
+        document.getElementById('total').textContent = rows.length;
+        loadingEl.remove();
 
-          if (!rows.length) {
-            errorEl.hidden = false;
-            errorEl.textContent = 'Пока нет ответов. Как только появятся — тут появятся графики.';
-            return;
-          }
+        if (!rows.length) {
+          errorEl.hidden = false;
+          errorEl.textContent = 'Пока нет ответов. Как только появятся — тут появятся графики.';
+          return;
+        }
 
-          const headers = results.meta.fields.filter(h => h && h.trim() !== '');
+        const headers = results.meta.fields.filter(h => h && h.trim() !== '');
 
-          headers.forEach((header) => {
-            if (/timestamp|отметка времени|id|email|почт/i.test(header)) return;
+        headers.forEach((header) => {
+          if (/timestamp|отметка времени|id|email|почт/i.test(header)) return;
 
-            const counts = {};
-            rows.forEach(r => {
-              const val = (r[header] || '').toString().trim() || 'Без ответа';
-              val.split(',').map(v => v.trim()).filter(Boolean).forEach(v => {
-                counts[v] = (counts[v] || 0) + 1;
-              });
-            });
-
-            const labels = Object.keys(counts);
-            const data   = Object.values(counts);
-
-            const card = document.createElement('div');
-            card.className = 'chart-card';
-            card.innerHTML = `<h3>${escapeHtml(header)}</h3><canvas></canvas>`;
-            chartsEl.appendChild(card);
-
-            const isBinary = labels.length === 2;
-            const isLongText = labels.some(l => l.length > 40);
-
-            new Chart(card.querySelector('canvas'), {
-              type: isBinary ? 'doughnut' : 'bar',
-              data: {
-                labels,
-                datasets: [{
-                  data,
-                  backgroundColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
-                  borderRadius: 6,
-                  borderWidth: 0
-                }]
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                indexAxis: isLongText ? 'y' : 'x',
-                plugins: {
-                  legend: {
-                    display: isBinary,
-                    position: 'bottom',
-                    labels: { font: { family: 'Manrope' }, padding: 12 }
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (ctx) => {
-                        const total = data.reduce((a, b) => a + b, 0);
-                        const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                        return ` ${ctx.parsed} (${pct}%)`;
-                      }
-                    }
-                  }
-                },
-                scales: isBinary ? {} : {
-                  x: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } },
-                  y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } }
-                }
-              }
+          const counts = {};
+          rows.forEach(r => {
+            const val = (r[header] || '').toString().trim() || 'Без ответа';
+            val.split(',').map(v => v.trim()).filter(Boolean).forEach(v => {
+              counts[v] = (counts[v] || 0) + 1;
             });
           });
-        },
-        error: () => {
-          loadingEl.remove();
-          errorEl.hidden = false;
-          errorEl.textContent =
-            'Не удалось загрузить данные. Проверьте, что таблица опубликована как CSV и ссылка верна.';
-        }
-      });
-    }
+
+          const labels = Object.keys(counts);
+          const data   = Object.values(counts);
+
+          const card = document.createElement('div');
+          card.className = 'chart-card';
+          card.innerHTML = `<h3>${escapeHtml(header)}</h3><canvas></canvas>`;
+          chartsEl.appendChild(card);
+
+          const isBinary = labels.length === 2;
+          const isLongText = labels.some(l => l.length > 40);
+
+          new Chart(card.querySelector('canvas'), {
+            type: isBinary ? 'doughnut' : 'bar',
+            data: {
+              labels,
+              datasets: [{
+                data,
+                backgroundColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
+                borderRadius: 6,
+                borderWidth: 0
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              indexAxis: isLongText ? 'y' : 'x',
+              plugins: {
+                legend: {
+                  display: isBinary,
+                  position: 'bottom',
+                  labels: { font: { family: 'Manrope' }, padding: 12 }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) => {
+                      const total = data.reduce((a, b) => a + b, 0);
+                      const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                      return ` ${ctx.parsed} (${pct}%)`;
+                    }
+                  }
+                }
+              },
+              scales: isBinary ? {} : {
+                x: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } },
+                y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } } }
+              }
+            }
+          });
+        });
+      },
+      error: () => {
+        loadingEl.remove();
+        errorEl.hidden = false;
+        errorEl.textContent =
+          'Не удалось загрузить данные. Проверьте, что таблица опубликована как CSV и ссылка верна.';
+      }
+    });
 
     function escapeHtml(s) {
       return s.replace(/[&<>"']/g, c =>
